@@ -11,7 +11,7 @@ export function useFoodOrder() {
   return useContext(foodOrderContext);
 }
 
-const socket = io('http://localhost:4000');
+const socket = io(process.env.server_api);
 
 export const FoodOrderProvider = ({ children }) => {
   const [orderListItem, setOrderListItem] = useState([]);
