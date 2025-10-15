@@ -1,0 +1,51 @@
+.glowing-btn {
+    position: relative;
+   
+    border: 0.15em solid var(--glow-color);
+    border-radius: 0.45em;
+    background: none;
+    perspective: 2em;
+  
+    -webkit-box-shadow: inset 0px 0px 0.5em 0px var(--glow-color),
+      0px 0px 0.5em 0px var(--glow-color);
+    -moz-box-shadow: inset 0px 0px 0.5em 0px var(--glow-color),
+      0px 0px 0.5em 0px var(--glow-color);
+    box-shadow: inset 0px 0px 0.5em 0px var(--glow-color),
+      0px 0px 0.5em 0px var(--glow-color);
+    animation: border-flicker 10s ease-in-out infinite;
+  }
+  
+  
+  @keyframes border-flicker {
+    10% {
+       border-color: var(--glow-color)
+    }
+    20% {
+        border-color: #000
+    }
+    30% {
+        border-color: var(--glow-color)
+    }
+    40% {
+        border-color: #000
+    }
+    50% {
+        border-color: var(--glow-color)
+    }
+    60% {
+        border-color: #000
+    }
+    70% {
+        border-color: var(--glow-color)
+    }
+    80% {
+        border-color: #000
+    }
+    90% {
+        border-color: var(--glow-color)
+    }
+    100% {
+        border-color: #000
+    }
+  }
+  
