@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 export const useAxios = ({ url, method = "GET", body = null, headers = {} }) => {
@@ -7,6 +7,9 @@ export const useAxios = ({ url, method = "GET", body = null, headers = {} }) => 
   const [response, setResponse] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const bodyRef = useRef(body);
+  const headersRef = useRef(headers);
 
   useEffect(() => {
     if (!url) return;
@@ -19,9 +22,9 @@ export const useAxios = ({ url, method = "GET", body = null, headers = {} }) => 
         const res = await axios({
           method,
           url: fullUrl,
-          data: body,
-          headers,
-          withCredentials: true, // if backend uses cookies
+          data: bodyRef.current,
+          headers: headersRef.current,
+          withCredentials: true,
         });
         setResponse(res.data);
       } catch (err) {
@@ -32,7 +35,7 @@ export const useAxios = ({ url, method = "GET", body = null, headers = {} }) => 
     };
 
     fetchData();
-  }, [url, apiUrl, method, body, headers]);
+  }, [url, apiUrl, method]); // ✅ no object dependencies
 
   return { response, error, loading };
 };
