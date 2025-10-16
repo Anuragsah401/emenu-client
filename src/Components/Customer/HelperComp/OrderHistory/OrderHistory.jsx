@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-
+import React from "react";
 import { useParams } from "react-router-dom";
-
 import OrderHistoryCard from "./OrderHistoryCard/OrderHistoryCard";
 import { useFoodOrder } from "Context/CustomerContext/FoodOrderContext";
 import LoadingIcon from "Assets/Icons/LoadingIcon";
@@ -16,33 +14,38 @@ const OrderHistory = ({
   const { tableId } = useParams();
   const { orderListItem, loading } = useFoodOrder();
 
-  const orderDataAccordingToTable = orderListItem?.filter(
-    (item) => item.tableNo === tableId && item.isCheckout === false && item.isCanceled === false
+  // ✅ Ensure orderListItem is always an array
+  const validOrders = Array.isArray(orderListItem) ? orderListItem : [];
+
+  // ✅ Filter safely
+  const orderDataAccordingToTable = validOrders.filter(
+    (item) =>
+      item?.tableNo === tableId &&
+      item?.isCheckout === false &&
+      item?.isCanceled === false
   );
 
   let orderList;
 
   if (loading) {
     orderList = <LoadingIcon />;
-  } else if (orderDataAccordingToTable?.length > 0) {
-    orderList = orderDataAccordingToTable.map((item, index) => {
-      return (
-        <OrderHistoryCard
-          key={index}
-          index={index}
-          foodList={item.foodList}
-          date={item.createdAt}
-          id={item._id}
-          orderStatus={item.orderStatus}
-          setOpenCheckoutModal={setOpenCheckoutModal}
-          setOpenLogoutModal={setOpenLogoutModal} 
-          setBackDrop={setBackDrop}
-          setSideBar={setSideBar}
-          setOrderId={setOrderId}
-          selectedTime={item.timer}
-        />
-      );
-    });
+  } else if (orderDataAccordingToTable.length > 0) {
+    orderList = orderDataAccordingToTable.map((item, index) => (
+      <OrderHistoryCard
+        key={item._id || index}
+        index={index}
+        foodList={item.foodList}
+        date={item.createdAt}
+        id={item._id}
+        orderStatus={item.orderStatus}
+        setOpenCheckoutModal={setOpenCheckoutModal}
+        setOpenLogoutModal={setOpenLogoutModal}
+        setBackDrop={setBackDrop}
+        setSideBar={setSideBar}
+        setOrderId={setOrderId}
+        selectedTime={item.timer}
+      />
+    ));
   } else {
     orderList = (
       <div className="text-center font-bold text-[1.5em] px-3 h-full flex justify-center items-center">
