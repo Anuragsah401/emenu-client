@@ -134,7 +134,7 @@ function App() {
                 </Route>
 
                 <Route
-                  path="/admin/"
+                  path="/admin"
                   element={
                     <AdminProtectedRoute>
                       <AdminLayout />

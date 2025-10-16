@@ -19,8 +19,6 @@ const Header = () => {
   };
 
   const { response, loading, error } = useAxios({ url: "/api/orderlist" })
-  
-  console.log(response);
 
   const [notificationList, setNotificationList] = useState([]);
   const [toggleNotification, setToggleNotification] = useState(false);

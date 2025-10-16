@@ -1,41 +1,55 @@
-import { useState, useEffect, useRef } from "react";
-import axios from "axios";
+// Hooks/useAxios.js
+import { useState, useEffect, useRef, useCallback } from "react";
+import api from "utils/axiosConfig";
 
-export const useAxios = ({ url, method = "GET", body = null, headers = {} }) => {
-  const apiUrl = process.env.REACT_APP_API_URL;
-
+export const useAxios = ({
+  url,
+  method = "GET",
+  body = null,
+  headers = {},
+  manual = false, // 👈 default false = auto fetch
+}) => {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const bodyRef = useRef(body);
   const headersRef = useRef(headers);
 
-  useEffect(() => {
-    if (!url) return;
-
-    const fullUrl = `${apiUrl}${url.startsWith("/") ? url : `/${url}`}`;
-
-    const fetchData = async () => {
+  const fetchData = useCallback(
+    async (overrideConfig = {}) => {
       setLoading(true);
       try {
-        const res = await axios({
+        const res = await api({
           method,
-          url: fullUrl,
-          data: bodyRef.current,
-          headers: headersRef.current,
-          withCredentials: true,
+          url,
+          data: overrideConfig.body || bodyRef.current,
+          headers: overrideConfig.headers || headersRef.current,
+          // 👈 allows overriding URL/method if needed
         });
         setResponse(res.data);
+        setError("");
+        return res.data;
       } catch (err) {
-        setError(err?.response?.data?.error || "Request failed");
+        const message = err?.response?.data?.error || "Request failed";
+        setError(message);
+        console.error("Axios error:", message);
+        throw err;
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [url, method]
+  );
 
-    fetchData();
-  }, [url, apiUrl, method]); // ✅ no object dependencies
+  useEffect(() => {
+    if (!manual && url) {
+      // ✅ only auto-fetch for non-manual calls
+      const controller = new AbortController();
+      fetchData({ signal: controller.signal }).catch(() => {});
+      return () => controller.abort();
+    }
+  }, [url, manual, fetchData]);
 
-  return { response, error, loading };
+  return { response, error, loading, fetchData };
 };

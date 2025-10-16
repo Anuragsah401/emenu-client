@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-
 import ContainerLayout from "Components/UI/Admin/ContainerLayout/ContainerLayout";
 import ContainerTitle from "Components/UI/Admin/ContainerTitle/ContainerTitle";
 import UploadImage from "./UploadImage";
-
-import axios from "axios";
-
 import { notify } from "Components/UI/Toast/Toast";
+import { useAxios } from "Hooks/useAxios"; // ✅ use custom hook
 
 const AddFoodItem = () => {
   const preventNegativeValue = (e) => {
@@ -26,28 +23,38 @@ const AddFoodItem = () => {
   const [price, setPrice] = useState("");
   const [image, setImage] = useState([]);
 
+  // ✅ initialize useAxios in manual mode
+  const { response, error, loading, fetchData } = useAxios({ manual: true });
+
   const addFoodItemHandler = async (e) => {
     e.preventDefault();
 
-      const formData = new FormData();
-      formData.append("name", foodName);
-      formData.append("price", price);
-      formData.append("category", category);
-      formData.append("img", image[0].file);
+    if (!image[0]?.file) return notify("Please upload an image");
 
-      await axios
-        .post("/api/food", formData)
-        .then((res) => {
-          
-          notify(`"${res.data.name}" was added to ${category}!`);
-          setFoodName("");
-          setCategory("");
-          setPrice("");
-          setImage([]);
-        })
-        .catch((error) => console.log(error.response.data.error));
-      // setDisabledBtn(false);
-    
+    const formData = new FormData();
+    formData.append("name", foodName);
+    formData.append("price", price);
+    formData.append("category", category);
+    formData.append("img", image[0].file);
+
+    try {
+      const res = await fetchData({
+        url: "/api/food", // relative to baseURL set in axiosConfig
+        method: "POST",
+        body: formData,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      notify(`"${res.name}" was added to ${category}!`);
+
+      // Reset form
+      setFoodName("");
+      setCategory("");
+      setPrice("");
+      setImage([]);
+    } catch (err) {
+      notify(error || "Something went wrong!");
+    }
   };
 
   return (
@@ -56,10 +63,7 @@ const AddFoodItem = () => {
         <div className="px-[3em] py-[1em]">
           <ContainerTitle title="Create Food Items to menu List" />
 
-          <form
-            onSubmit={addFoodItemHandler}
-            className="flex flex-col gap-1 mt-5"
-          >
+          <form onSubmit={addFoodItemHandler} className="flex flex-col gap-1 mt-5">
             <label htmlFor="foodName" className={labelStyle}>
               Food Name:
             </label>
@@ -111,40 +115,19 @@ const AddFoodItem = () => {
             <label htmlFor="image" className={labelStyle}>
               Image:
             </label>
-            <UploadImage image={image} setImage={setImage} required={true}/>
+            <UploadImage image={image} setImage={setImage} required={true} />
 
-            <button className="w-[300px] font-semibold mt-5 px-[5em] py-3 bg-[#20CFBA] rounded-lg ml-[7em] hover:bg-[#084942] hover:text-white">
-              Add Food Item
+            <button
+              className="w-[300px] font-semibold mt-5 px-[5em] py-3 bg-[#20CFBA] rounded-lg ml-[7em] hover:bg-[#084942] hover:text-white"
+              disabled={loading}
+            >
+              {loading ? "Adding..." : "Add Food Item"}
             </button>
           </form>
         </div>
       </div>
-      
     </ContainerLayout>
   );
 };
 
 export default AddFoodItem;
-
-// Aankhein jhukti chubhan mein
-// Ashkon mein magan yeh
-// Kaisi teri saansein chadh gayi
-
-// Ho sakhiyan dekhe anjuman mein
-// Soche sab mann mein
-// Kaisi kaisi baatein ban gayi
-
-// struming
-
-// Teri aankh yeh jo namm hai
-// Inmein jo gham hai
-
-// Chhod ke subah pe kar yakeen
-// Ho yeh jo jhoomta sawan hai
-// Meethi jo pawan hai
-// Teri hi muskaan se hai bani
-
-// Cm Am F G F G C
-// Ho teri baaton ki chehak ko na jaane
-// Na jaane kaisi raat mil gayi
-// Na jaane kaisi raat mil gayi

@@ -1,34 +1,33 @@
-import React, { useState, useEffect } from "react";
-
-import axios from "axios";
-
+import React, { useEffect } from "react";
 import DashboardFoodLayout from "./HelperComp/DashboardFoodLayout";
-
 import { useAdminContext } from "Context/AdminContext/AdminContext";
+import { useAxios } from "Hooks/useAxios";
 
 const MostPopularFood = () => {
   const { mostPopularTableData, setMostPopularTableData } = useAdminContext();
-  // const [tableData, setTableData] = useState(null);
 
+  // Fetch data using custom hook
+  const { response, loading, error } = useAxios({
+    url: "/api/mostpopularfood",
+  });
+
+  // Update context when response arrives
   useEffect(() => {
-    axios
-      .get("/api/mostpopularfood")
-      .then((res) => {
-        setMostPopularTableData(res?.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    if (response) {
+      setMostPopularTableData(response);
+    }
+  }, [response, setMostPopularTableData]);
 
   return (
     <DashboardFoodLayout
       title="Most Popular Foods"
-      description="List of most Popular Foods"
+      description="List of most popular foods"
       tableData={mostPopularTableData}
       buttonTitle="Add Most Popular Food"
       setTableData={setMostPopularTableData}
       apiUrl="/api/mostpopularfood/"
+      loading={loading}
+      error={error}
     />
   );
 };

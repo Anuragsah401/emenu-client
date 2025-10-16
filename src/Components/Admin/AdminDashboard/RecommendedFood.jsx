@@ -1,38 +1,35 @@
-import React, { useState, useEffect } from "react";
-
-import axios from "axios";
-
+import React, { useEffect } from "react";
 import DashboardFoodLayout from "./HelperComp/DashboardFoodLayout";
-
 import { useAdminContext } from "Context/AdminContext/AdminContext";
+import { useAxios } from "Hooks/useAxios";
 
 const RecommendedFood = () => {
-  const { recommendedTableData,
-    setrecommendedTableData} =
-  useAdminContext();
-    // const [tableData, setTableData] = useState(null);
+  const { recommendedTableData, setrecommendedTableData } = useAdminContext();
 
-    useEffect(() => {
-      axios
-        .get("/api/recommendedfood")
-        .then((res) => {
-          setrecommendedTableData(res?.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }, []);
-  
-    return (
-      <DashboardFoodLayout
-        title="Recommended Foods"
-        description="List of Recommended Foods"
-        tableData={recommendedTableData}
-        buttonTitle="Add Recommended Food"
-        setTableData={setrecommendedTableData}
-        apiUrl="/api/recommendedfood/"
-      />
-    );
-}
+  // Fetch data using useAxios
+  const { response, loading, error } = useAxios({
+    url: "/api/recommendedfood",
+  });
 
-export default RecommendedFood
+  // Update context when data is received
+  useEffect(() => {
+    if (response) {
+      setrecommendedTableData(response);
+    }
+  }, [response, setrecommendedTableData]);
+
+  return (
+    <DashboardFoodLayout
+      title="Recommended Foods"
+      description="List of Recommended Foods"
+      tableData={recommendedTableData}
+      buttonTitle="Add Recommended Food"
+      setTableData={setrecommendedTableData}
+      apiUrl="/api/recommendedfood/"
+      loading={loading}
+      error={error}
+    />
+  );
+};
+
+export default RecommendedFood;
