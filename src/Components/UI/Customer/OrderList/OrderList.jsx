@@ -1,17 +1,15 @@
-import React from "react";
-
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faBowlFood } from "@fortawesome/free-solid-svg-icons";
+import React, { memo } from "react";
 import { useFoodCard } from "Context/CustomerContext/FoodCardContext";
 
-const OrderList = (props) => {
+const OrderList = ({ openmodal }) => {
   const { foodListItem } = useFoodCard();
+
   return (
     <div
-      onClick={() => props.openmodal(true)}
+      onClick={openmodal}
       className="fixed right-12 bottom-12 px-4 py-4 bg-[#000000e1] rounded cursor-pointer active:bg-[red] z-50"
     >
-      <div className="relative ">
+      <div className="relative">
         <span className="absolute text-xl font-bold -top-4 -right-[0.7rem] tracking-tighter text-[#fff]">
           {foodListItem.length}
         </span>
@@ -30,4 +28,4 @@ const OrderList = (props) => {
   );
 };
 
-export default OrderList;
+export default memo(OrderList);
