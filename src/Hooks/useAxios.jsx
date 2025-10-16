@@ -4,8 +4,6 @@ import axios from "axios";
 export const useAxios = ({ url }) => {
   // ✅ CRA env variables must start with REACT_APP_
   const apiUrl = process.env.REACT_APP_API_URL
-
-  console.log(apiUrl);
   
 
   const [response, setResponse] = useState(undefined);
