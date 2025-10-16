@@ -4,5 +4,7 @@ module.exports = {
   rules: {
     // your custom rules
   },
-  ignoreDuringBuilds: process.env.CI === 'true', // 👈 disables failing on warnings in CI
+//   ignoreDuringBuilds: process.env.CI === 'true', // 👈 disables failing on warnings in CI
 };
+
+
