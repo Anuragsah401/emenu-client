@@ -1,33 +1,38 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-export const useAxios = ({ url }) => {
-  // ✅ CRA env variables must start with REACT_APP_
-  const apiUrl = process.env.REACT_APP_API_URL
-  
+export const useAxios = ({ url, method = "GET", body = null, headers = {} }) => {
+  const apiUrl = process.env.REACT_APP_API_URL;
 
-  const [response, setResponse] = useState(undefined);
+  const [response, setResponse] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (url) {
-      // ✅ Combine base URL with the endpoint
-      const fullUrl = `${apiUrl}${url.startsWith("/") ? url : `/${url}`}`;
+    if (!url) return;
 
-      axios
-        .get(fullUrl)
-        .then((res) => {
-          setResponse(res?.data);
-        })
-        .catch((error) => {
-          setError(error?.response?.data?.error || "Request failed");
-        })
-        .finally(() => {
-          setLoading(false);
+    const fullUrl = `${apiUrl}${url.startsWith("/") ? url : `/${url}`}`;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await axios({
+          method,
+          url: fullUrl,
+          data: body,
+          headers,
+          withCredentials: true, // if backend uses cookies
         });
-    }
-  }, [url, apiUrl]);
+        setResponse(res.data);
+      } catch (err) {
+        setError(err?.response?.data?.error || "Request failed");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [url, apiUrl, method, body, headers]);
 
   return { response, error, loading };
 };
