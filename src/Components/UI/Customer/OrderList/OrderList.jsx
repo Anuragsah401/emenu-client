@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import { useFoodCard } from "Context/CustomerContext/FoodCardContext";
 
 const OrderList = ({ openmodal }) => {
-  const { foodListItem } = useFoodCard();
+  const { orderListItem } = useFoodOrder();
 
   return (
     <div
