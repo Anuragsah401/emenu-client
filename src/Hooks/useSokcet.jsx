@@ -4,10 +4,11 @@ import { Socket, io } from "socket.io-client";
 
 const useSokcet = () => {
 
-    const socket = io(process.env.server_api);
+  
     
   useEffect(() => {
-    const socket = io(process.env.server_api);
+    const socket = io(process.env.REACT_APP_SOCKET_URL || "http://localhost:4000");
+
     console.log("emitting");
 
     socket.on("connection", (data) => {
