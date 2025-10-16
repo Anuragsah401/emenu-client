@@ -1,10 +1,6 @@
 module.exports = {
-  // your existing config
-  extends: ['eslint:recommended', 'next', 'next/core-web-vitals'],
+  extends: ['react-app', 'react-app/jest'],
   rules: {
-    // your custom rules
+    // Add any custom rules here
   },
-//   ignoreDuringBuilds: process.env.CI === 'true', // 👈 disables failing on warnings in CI
 };
-
-
