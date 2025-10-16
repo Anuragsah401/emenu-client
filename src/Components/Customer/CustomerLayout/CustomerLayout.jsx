@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-
 import axios from "axios";
 
-// import ScrollDownIcon from "../../UI/ScrollDownIcon/ScrollDownIcon";
 import Navbar from "Components/UI/Customer/Navbar/Navbar";
 import OrderList from "Components/UI/Customer/OrderList/OrderList";
 import Modal from "Components/UI/Modal/Modal";
@@ -17,16 +15,13 @@ import LogoutModal from "../HelperComp/LogoutModal/LogoutModal";
 import Checkout from "../../UI/Customer/Checkout/Checkout";
 
 import { io } from "socket.io-client";
-import {notify} from "Components/UI/Toast/Toast";
-import acceptTone from "Assets/tone/acceptorder.mp3"
-import cancelTone from "Assets/tone/cancelorder.mp3"
-
-const socket = io('http://localhost:4000');
-
+import { notify } from "Components/UI/Toast/Toast";
+import acceptTone from "Assets/tone/acceptorder.mp3";
+import cancelTone from "Assets/tone/cancelorder.mp3";
 
 const CustomerLayout = ({ children }) => {
-  const [accept] = useState(new Audio(acceptTone))
-  const [cancel] = useState(new Audio(cancelTone))
+  const [accept] = useState(new Audio(acceptTone));
+  const [cancel] = useState(new Audio(cancelTone));
   const navigate = useNavigate();
 
   const [modal, setModal] = useState(false);
@@ -36,86 +31,54 @@ const CustomerLayout = ({ children }) => {
   const [openCheckoutModal, setOpenCheckoutModal] = useState(false);
   const [orderId, setOrderId] = useState();
   const [paymethod, setPayMethod] = useState("");
-  // const [battery, setBattery] = useState({ level: 0, charging: false });
 
-  // const handleBatteryChange = async ({ target: { level, charging } }) => {
-  //   //  setBattery({ level, charging });
-  //   const isAuthenticated = localStorage.getItem("customer");
-
-  //   const id = JSON.parse(isAuthenticated)?.id;
-  //   await axios
-  //     .patch(`/api/customer/updatecustomer/${id}`, {
-  //       battryPercent: level * 100,
-  //     })
-  //     .then((response) => {
-  //       // console.log(response);
-  //     })
-  //     .catch((err) => console.log(err.res));
-  // };
-
-  // useEffect(() => {
-  //   let battery;
-  //   navigator.getBattery().then((bat) => {
-  //     battery = bat;
-  //     battery.addEventListener("levelchange", handleBatteryChange);
-  //     battery.addEventListener("chargingchange", handleBatteryChange);
-  //     handleBatteryChange({ target: battery });
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   const isAuthenticated = localStorage.getItem("customer");
-
-  //   if (isAuthenticated == null) {
-  //     navigate(-1);
-  //   }
-
-  //   if (isAuthenticated) {
-  //     const id = JSON.parse(isAuthenticated).id;
-  //     axios
-  //       .patch(`/api/customer/updatecustomer/${id}`, {
-  //         activeStatus: "online",
-  //       })
-  //       .then((response) => {
-  //         // console.log(response);
-  //       });
-  //   }
-
-  //   return () => {
-  //     const id = JSON.parse(isAuthenticated).id;
-  //     axios
-  //       .patch(`/api/customer/updatecustomer/${id}`, {
-  //         activeStatus: "offline",
-  //         battryPercent: 0,
-  //       })
-  //       .then((response) => {
-  //         // console.log(response);
-  //       });
-  //   };
-  // }, []);
+  // ✅ Socket ref
+  const socketRef = useRef(null);
 
   useEffect(() => {
-
-    socket.on('update order', (updatedOrder) => { 
-      if(updatedOrder?.orderStatus === "started") {
-        accept.play();
-        notify("Your order has been started")
-      } else if(updatedOrder?.orderStatus === "canceled") {
-        notify("Your order has been canceled")
-        cancel.play();
-      }else if(updatedOrder?.orderStatus === "completed") {
-        notify("Your order has been completed")
-      }
+    // ✅ Use environment variable in production
+    const socketURL = process.env.REACT_APP_SOCKET_URL || "http://localhost:4000";
+    const socket = io(socketURL, {
+      transports: ["websocket", "polling"],
+      withCredentials: true,
     });
-  }, []);
+
+    socketRef.current = socket;
+
+    // ✅ Listen for order updates
+    const handleUpdateOrder = (updatedOrder) => {
+      if (!updatedOrder) return;
+
+      switch (updatedOrder.orderStatus) {
+        case "started":
+          accept.play();
+          notify("Your order has been started");
+          break;
+        case "canceled":
+          cancel.play();
+          notify("Your order has been canceled");
+          break;
+        case "completed":
+          notify("Your order has been completed");
+          break;
+        default:
+          break;
+      }
+    };
+
+    socket.on("update order", handleUpdateOrder);
+
+    // ✅ Cleanup on unmount
+    return () => {
+      socket.off("update order", handleUpdateOrder);
+      socket.disconnect();
+      console.log("🧹 CustomerLayout socket disconnected");
+    };
+  }, [accept, cancel]);
 
   return (
     <div className="bg-[#eee] relative max-h-full min-h-[100vh]">
-      <Navbar
-        backDrop={backDrop}
-        setBackDrop={setBackDrop}
-        setSideBar={setSideBar}
-      />
+      <Navbar backDrop={backDrop} setBackDrop={setBackDrop} setSideBar={setSideBar} />
 
       <SideBar
         backDrop={backDrop}
@@ -134,7 +97,6 @@ const CustomerLayout = ({ children }) => {
       </SideBar>
 
       <FoodCategories />
-
       <OrderList openmodal={setModal} />
 
       <Modal setModal={setModal} modal={modal}>
@@ -146,11 +108,10 @@ const CustomerLayout = ({ children }) => {
       </Modal>
 
       <Modal setModal={setOpenCheckoutModal} modal={openCheckoutModal} setPayMethod={setPayMethod}>
-        <Checkout orderId={orderId} paymethod={paymethod} setPayMethod={setPayMethod}/>
+        <Checkout orderId={orderId} paymethod={paymethod} setPayMethod={setPayMethod} />
       </Modal>
 
       <OrderPlaced />
-
       <Outlet />
     </div>
   );
