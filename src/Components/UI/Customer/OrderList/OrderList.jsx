@@ -2,11 +2,11 @@ import React, { memo } from "react";
 import { useFoodCard } from "Context/CustomerContext/FoodCardContext";
 
 const OrderList = ({ openmodal }) => {
-  const { orderListItem } = useFoodOrder();
+  const { foodListItem } = useFoodCard(); // use the correct context
 
   return (
     <div
-      onClick={openmodal}
+      onClick={openmodal} // pass a stable callback from parent
       className="fixed right-12 bottom-12 px-4 py-4 bg-[#000000e1] rounded cursor-pointer active:bg-[red] z-50"
     >
       <div className="relative">
