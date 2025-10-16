@@ -1,18 +1,17 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { io } from "socket.io-client";
-import api from "utils/axiosConfig";
-import { notify } from "Components/UI/Toast/Toast";
+import React, { useContext, useState, useEffect } from "react";
 
-const FoodOrderContext = createContext();
+import axios from "axios";
+import { io } from "socket.io-client";
+import {notify} from "Components/UI/Toast/Toast";
+
+
+const foodOrderContext = React.createContext();
 
 export function useFoodOrder() {
-  return useContext(FoodOrderContext);
+  return useContext(foodOrderContext);
 }
 
-// Initialize Socket.io
-const socket = io(process.env.REACT_APP_SERVER_API, {
-  transports: ["websocket"],
-});
+const socket = io(process.env.server_api);
 
 export const FoodOrderProvider = ({ children }) => {
   const [orderListItem, setOrderListItem] = useState([]);
@@ -20,57 +19,43 @@ export const FoodOrderProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [notificationList, setNotificationList] = useState([]);
 
-  // Fetch orders once
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get("/api/orderlist");
-        setOrderListItem(res.data);
-      } catch (err) {
-        console.error(err?.response?.data?.error || "Failed to fetch orders");
-      } finally {
-        setLoading(false);
-      }
-    };
+    setLoading(true);
 
-    fetchOrders();
+    axios
+      .get("/api/orderlist")
+      .then((res) => {
+        setOrderListItem(res?.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data.error);
+      })
+      .finally(() => setLoading(false));
+  },[]);
+
+  useEffect(() => {
+    socket.on('update order', (updatedOrder) => { 
+      setOrderListItem(prev => prev.map((order) => (order._id === updatedOrder._id ? updatedOrder : order)))
+    });
   }, []);
 
-  // Socket.io listener for real-time updates
-  useEffect(() => {
-    const updateHandler = (updatedOrder) => {
-      setOrderListItem((prev) =>
-        prev.map((order) =>
-          order._id === updatedOrder._id ? updatedOrder : order
-        )
-      );
-    };
-
-    socket.on("update order", updateHandler);
-
-    return () => {
-      socket.off("update order", updateHandler);
-    };
-  }, []);
-
-  // Delete / cancel order
   const deleteListHandler = async (id) => {
-    try {
-      await api.patch(`/api/orderlist/updatecancel/${id}`, {
-        isCanceled: true,
-      });
-      notify("Order removed!");
+    const updated = { isCanceled: true };
 
-      setOrderListItem((prev) => prev.filter((item) => item._id !== id));
-    } catch (err) {
-      console.error(err?.response?.data?.error || "Failed to remove order");
-      notify("Failed to remove order");
+    if (updated) {
+      await axios
+        .patch(`/api/orderlist/updatecancel/${id}`, updated)
+        .then((response) => {
+          notify(`order removed!`);
+        });
     }
+
+    const deleted = orderListItem?.filter((item) => item._id !== id);
+    setOrderListItem(deleted);
   };
 
   return (
-    <FoodOrderContext.Provider
+    <foodOrderContext.Provider
       value={{
         orderListItem,
         setOrderListItem,
@@ -83,6 +68,6 @@ export const FoodOrderProvider = ({ children }) => {
       }}
     >
       {children}
-    </FoodOrderContext.Provider>
+    </foodOrderContext.Provider>
   );
 };
