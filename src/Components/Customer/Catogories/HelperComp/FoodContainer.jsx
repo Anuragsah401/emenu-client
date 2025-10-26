@@ -12,7 +12,7 @@ const FoodContainer = ({ title, category }) => {
     url: "/api/food", // will fetch from baseURL + /api/food
   });
 
-  // filter items based on category
+    // filter items based on category
   const filteredFoodItems = foodItems?.filter(item => item?.category === category);
 
   return (

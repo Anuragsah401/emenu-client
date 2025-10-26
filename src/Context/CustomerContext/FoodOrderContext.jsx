@@ -5,55 +5,74 @@ import api from "utils/axiosConfig";
 import { notify } from "Components/UI/Toast/Toast";
 
 const FoodOrderContext = createContext();
-
-export function useFoodOrder() {
-  return useContext(FoodOrderContext);
-}
+export const useFoodOrder = () => useContext(FoodOrderContext);
 
 export const FoodOrderProvider = ({ children }) => {
   const [orderListItem, setOrderListItem] = useState([]);
   const [loading, setLoading] = useState(false);
   const socketRef = useRef(null);
-  const hasFetchedOrders = useRef(false); // ✅ Track if we already fetched
 
   useEffect(() => {
-    if (hasFetchedOrders.current) return; // Prevent multiple fetches
+    const socketURL = process.env.REACT_APP_SOCKET_URL || "http://localhost:4000";
 
+    // ✅ Create socket connection (same config as KitchenContext)
+    const socket = io(socketURL, {
+      transports: ["websocket", "polling"],
+      withCredentials: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      console.log("✅ FoodOrder socket connected:", socket.id);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("❌ FoodOrder socket disconnected");
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("⚠️ FoodOrder socket connection error:", error.message);
+    });
+
+    // ✅ Handle order update
+    socket.on("update order", (updatedOrder) => {
+      console.log("📦 Order updated:", updatedOrder);
+      setOrderListItem((prev) =>
+        prev.map((order) => (order._id === updatedOrder._id ? updatedOrder : order))
+      );
+    });
+
+    // ✅ Cleanup on unmount
+    return () => {
+      socket.disconnect();
+      console.log("🧹 FoodOrder socket disconnected (cleanup)");
+    };
+  }, []);
+
+  // ✅ Optional: Fetch initial orders from API (if needed)
+  /*
+  useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const res = await api.get("/api/orderlist");
-        setOrderListItem(res.data);
-        hasFetchedOrders.current = true; // ✅ Mark as fetched
-      } catch (err) {
-        console.error(err?.response?.data?.error || "Failed to fetch orders");
+        const res = await api.get("/api/orderlist/customerorders");
+        if (Array.isArray(res.data)) {
+          setOrderListItem(res.data);
+        }
+      } catch (error) {
+        console.error("❌ Failed to fetch customer orders:", error.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchOrders();
-  }, []); // empty dependency → runs only once
-
-  // Socket connection (stable using useRef)
-  useEffect(() => {
-    if (!socketRef.current) {
-      socketRef.current = io(process.env.REACT_APP_SERVER_API, { transports: ["websocket"] });
-    }
-
-    const socket = socketRef.current;
-
-    const updateHandler = (updatedOrder) => {
-      setOrderListItem((prev) =>
-        prev.map((order) => (order._id === updatedOrder._id ? updatedOrder : order))
-      );
-    };
-
-    socket.on("update order", updateHandler);
-
-    return () => socket.off("update order", updateHandler);
   }, []);
+  */
 
+  // ✅ Delete handler
   const deleteListHandler = async (id) => {
     try {
       await api.patch(`/api/orderlist/updatecancel/${id}`, { isCanceled: true });

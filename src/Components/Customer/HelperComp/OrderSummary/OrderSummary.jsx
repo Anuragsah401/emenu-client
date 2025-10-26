@@ -1,62 +1,66 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-
-import axios from "axios";
-
-// import { notify, Toast } from "Components/UI/Toast/Toast";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 import SummaryFoodCard from "./SummaryFoodCard/SummaryFoodCard";
+import NoOrderList from "Components/UI/Customer/NoOrderList/NoOrderList";
+import { notify } from "Components/UI/Toast/Toast";
 
 import { useFoodCard } from "Context/CustomerContext/FoodCardContext";
 import { useFoodOrder } from "Context/CustomerContext/FoodOrderContext";
-
-import NoOrderList from "Components/UI/Customer/NoOrderList/NoOrderList";
-import { notify } from "Components/UI/Toast/Toast";
+import { useAxios } from "Hooks/useAxios";
 
 const OrderSummary = (props) => {
   const { tableId } = useParams();
   const { foodListItem, totalPrice, setFoodListItem } = useFoodCard();
-  const { setIsOrderPlaced, setOrderListItem } =
-    useFoodOrder();
+  const { setIsOrderPlaced, setOrderListItem } = useFoodOrder();
 
   const [error, setError] = useState("");
 
-  const foodOrderHandler = async () => {
+  // ✅ useAxios hook in manual mode
+  const { fetchData, loading } = useAxios({ manual: true });
 
-      await axios
-        .post("/api/orderlist/", {
+  const foodOrderHandler = async () => {
+    try {
+      const data = await fetchData({
+        url: "/api/orderlist/",
+        method: "POST",
+        body: {
           foodList: [...foodListItem],
           tableNo: tableId,
           notifications: ["order placed"],
-          timer: 120
-        })
-        .then((res) => {
-          setOrderListItem(prev => [...res.data, ...prev])
-          props.closeModal(false);
-          setIsOrderPlaced(true);
-          setFoodListItem([]);
-          notify(`Order request has been sent!`);
-        })
-        .catch((error) => setError(error.response.data.error));
-    
+          timer: 120,
+        },
+      });
+
+      // ✅ Ensure data returned is valid before updating state
+      if (data) {
+        setOrderListItem((prev) => [data, ...prev]); // ✅ Keep latest on top
+        props.closeModal(false);
+        setIsOrderPlaced(true);
+        setFoodListItem([]);
+        notify("Order request has been sent!");
+      }
+    } catch (err) {
+      console.error("Order error:", err);
+      setError(err?.response?.data?.error || "Failed to place order");
+    }
   };
 
   return (
-    <div className="md:flex ">
+    <div className="md:flex">
       <div className="w-full p-4 px-5 py-5">
-        <div className="md:grid md:grid-row-2 gap-2 ">
+        <div className="md:grid md:grid-row-2 gap-2">
           <h1 className="text-xl font-medium underline pt-5 w-full">
             Food order summary!
           </h1>
 
-          {foodListItem.length > 0 ? (
+          {foodListItem?.length > 0 ? (
             <>
               <div className="col-span-2 p-5 pt-0">
                 <div className="h-[300px] overflow-y-auto pr-5">
-                  {foodListItem.map((item) => (
+                  {foodListItem?.map((item) => (
                     <SummaryFoodCard key={item?._id} foodItem={item} />
                   ))}
                 </div>
@@ -82,19 +86,29 @@ const OrderSummary = (props) => {
                       Subtotal:
                     </span>
                     <span className="text-lg font-bold text-gray-800 pr-8">
-                      {" "}
                       ${totalPrice}
                     </span>
                   </div>
                 </div>
               </div>
+
               <div className="p-5 bg-gray-800 rounded overflow-visible col-span-2">
                 <button
                   onClick={foodOrderHandler}
-                  className="h-12 w-full bg-[#20cfba] rounded focus:outline-none text-white active:bg-[red]"
+                  disabled={loading}
+                  className={`h-12 w-full rounded text-white focus:outline-none transition-all ${
+                    loading
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-[#20cfba] active:bg-[red]"
+                  }`}
                 >
-                  -- Order Now --
+                  {loading ? "Placing Order..." : "-- Order Now --"}
                 </button>
+                {error && (
+                  <p className="text-red-500 text-center mt-2 font-medium">
+                    {error}
+                  </p>
+                )}
               </div>
             </>
           ) : (

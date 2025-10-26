@@ -51,7 +51,7 @@ const FoodCard = ({ food }) => {
             src={
               imageError
                 ? "/placeholder.png" // local fallback image
-                : `${process.env.REACT_APP_API_URL}/images/${img}`
+                : `${process.env.REACT_APP_API_URL}/${img}`
             }
             alt={name}
             className="w-full h-full object-cover"
