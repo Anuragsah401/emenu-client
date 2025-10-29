@@ -59,7 +59,7 @@ const FoodTable = ({
                 </td>
                 <td className="first:border-l-2 last:border-r-2 first:rounded-l-md last:rounded-r-md py-6 px-4 border-y-2 border-[#C75454]">
                   <img
-                    src={`http://localhost:4000/${item.img}`}
+                    src={`${process.env.REACT_APP_API_URL}/${item.img}`}
                     alt={item.name}
                     className="w-[50px] h-[50px] object-cover rounded-md hover:scale-[3] transition-all duration-[550ms]"
                   />
