@@ -19,35 +19,34 @@ const OrderSummary = (props) => {
   const [error, setError] = useState("");
 
   // ✅ useAxios hook in manual mode
-  const { fetchData, loading } = useAxios({ manual: true });
+  const { fetchData, loading } = useAxios({ manual: false });
 
   const foodOrderHandler = async () => {
-    try {
-      const data = await fetchData({
-        url: "/api/orderlist/",
-        method: "POST",
-        body: {
-          foodList: [...foodListItem],
-          tableNo: tableId,
-          notifications: ["order placed"],
-          timer: 120,
-        },
-      });
+  try {
+    const order = await fetchData({
+      url: "/api/orderlist/",
+      method: "POST",
+      body: {
+        foodList: [...foodListItem],
+        tableNo: tableId,
+        notifications: ["order placed"],
+        timer: 120,
+      },
+    }).then((order) => {
+       // order is a SINGLE OBJECT (not array)
+       props.closeModal(false);
+    setOrderListItem((prev) => [order, ...prev]);
 
-      // ✅ Ensure data returned is valid before updating state
-      if (data) {
-        setOrderListItem((prev) => [data, ...prev]); // ✅ Keep latest on top
-        props.closeModal(false);
-        setIsOrderPlaced(true);
-        setFoodListItem([]);
-        notify("Order request has been sent!");
-      }
-    } catch (err) {
-      console.error("Order error:", err);
-      setError(err?.response?.data?.error || "Failed to place order");
-    }
-  };
-
+    setIsOrderPlaced(true);
+    setFoodListItem([]);
+    notify("Order request has been sent!");
+}
+);}
+catch (err) {
+    console.error("Order error:", err);
+    setError(err?.response?.data?.error || "Failed to place order");
+  }
+};
   return (
     <div className="md:flex">
       <div className="w-full p-4 px-5 py-5">

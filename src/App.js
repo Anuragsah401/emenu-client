@@ -61,119 +61,115 @@ import { Toast } from "Components/UI/Toast/Toast";
 import "./App.css";
 
 function App() {
-  const [deviceWidth, setDeviceWidth] = useState(window.innerWidth);
-  const maxSupportedWidth = 768; // Change this value according to your application's requirements
+  // const [deviceWidth, setDeviceWidth] = useState(window.innerWidth);
+  // const maxSupportedWidth = 768; // Change this value according to your application's requirements
 
-  useEffect(() => {
-    const handleResize = () => {
-      setDeviceWidth(window.innerWidth);
-    };
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     setDeviceWidth(window.innerWidth);
+  //   };
 
-    window.addEventListener("resize", handleResize);
+  //   window.addEventListener("resize", handleResize);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("resize", handleResize);
+  //   };
+  // }, []);
 
-  if (deviceWidth < maxSupportedWidth) {
-    return (
-      <div className="flex flex-col justify-center items-center h-[100vh]">
-        <div className="text-[3em] font-semibold">Sorry!</div>
-        <p className="text-[1.5em] text-center">
+  // if (deviceWidth < maxSupportedWidth) {
+  //   return (
+  //     <div className="flex flex-col justify-center items-center h-[100vh]">
+  //       <div className="text-[3em] font-semibold">Sorry!</div>
+  //       <p className="text-[1.5em] text-center">
 
-        This application does not support this screen size.
-        </p>
-      </div>
-    );
-  }
+  //       This application does not support this screen size.
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
       <Toast />
-    <FoodCardProvider>
-      <FoodOrderProvider>
-        <AdminContextProvider>
-          <KitchenContextProvider>
-            <div>
-              <Routes>
+      <FoodCardProvider>
+        <FoodOrderProvider>
+          <AdminContextProvider>
+            <KitchenContextProvider>
+              <div>
+                <Routes>
+                  {/* <Route path="/" element={<Home />} /> */}
+                  {/* <Route path="/chooseuser" element={<ChooseUser />} /> */}
+                  <Route path="/kitchen/login" element={<Kitchen />} />
+                  <Route path="/admin/login" element={<Admin />} />
 
-                {/* <Route path="/" element={<Home />} /> */}
-                {/* <Route path="/chooseuser" element={<ChooseUser />} /> */}
-                <Route path="/kitchen/login" element={<Kitchen />} />
-                <Route path="/admin/login" element={<Admin />} />
-
-                {/* <Route path="/customer" element={<Customer />} />
+                  {/* <Route path="/customer" element={<Customer />} />
                 <Route
                   path="/customer/login/:tableId"
                   element={<CUstomerLoginPage />}
                 /> */}
 
-                <Route path="/customer/:tableId/*" element={<CustomerLayout />}>
-                  <Route path="" element={<CustomerDashboard />} />
-                  <Route path="bakery" element={<Backery />} />
-                  <Route path="beverages" element={<Baverage />} />
-                  <Route path="breakfast" element={<Breakfast />} />
-                  <Route path="desserts" element={<Dessert />} />
-                  <Route path="lunch" element={<Lunch />} />
-                  <Route path="snacks" element={<Snacks />} />
-                  <Route path=":foodname" element={<SearchedResult />} />
-                </Route>
-
-                <Route
-                  path="/kitchen"
-                  element={
-                    <KitchenProtectedRoute>
-                      <KitchenLayout />
-                    </KitchenProtectedRoute>
-                  }
-                >
-                  <Route path="orders" element={<FoodOrders />} />
-                  <Route path="completed" element={<CompletedOrders />} />
-                  <Route path="canceled" element={<CanceledOrders />} />
-                </Route>
-
-                <Route
-                  path="/admin"
-                  element={
-                    <AdminProtectedRoute>
-                      <AdminLayout />
-                    </AdminProtectedRoute>
-                  }
-                >
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route path="customers" element={<CustomerOrUser />}>
-                    <Route path="" element={<CustomerList />} />
-                    <Route
-                      path="create-customer"
-                      element={<CreateCustomer />}
-                    />
-                    <Route path="editcustomer" element={<EditCustomerForm />} />
+                  <Route path="/customer/:tableId/*" element={<CustomerLayout />}>
+                    <Route path="" element={<CustomerDashboard />} />
+                    <Route path="bakery" element={<Backery />} />
+                    <Route path="beverages" element={<Baverage />} />
+                    <Route path="breakfast" element={<Breakfast />} />
+                    <Route path="desserts" element={<Dessert />} />
+                    <Route path="lunch" element={<Lunch />} />
+                    <Route path="snacks" element={<Snacks />} />
+                    <Route path=":foodname" element={<SearchedResult />} />
                   </Route>
-                  <Route path="addfooditem" element={<AddFoodItem />} />
-                  <Route path="addfooditem" element={<AddFoodItem />} />
-                  <Route path="devices" element={<Devices />} />
-                  <Route path="categories" element={<Categories />}>
-                    <Route path="" element={<CategoriesList />} />
-                    <Route path="bakery" element={<BackeryItems />} />
-                    <Route path="desserts" element={<DessertsItems />} />
-                    <Route path="lunch" element={<LunchItems />} />
-                    <Route path="breakfast" element={<BreakfastItems />} />
-                    <Route path="beverages" element={<BaverageItems />} />
-                    <Route path="snacks" element={<SnackItems />} />
-                  </Route>
-                  <Route path="orders" element={<Orders />} />
-                  <Route path="searchfood/:foodname" element={<SearchFood />} />
-                  <Route path="editfood" element={<FoodItemEditForm />} />
-                </Route>
 
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </KitchenContextProvider>
-        </AdminContextProvider>
-      </FoodOrderProvider>
-    </FoodCardProvider>
+                  <Route
+                    path="/kitchen"
+                    element={
+                      <KitchenProtectedRoute>
+                        <KitchenLayout />
+                      </KitchenProtectedRoute>
+                    }
+                  >
+                    <Route path="orders" element={<FoodOrders />} />
+                    <Route path="completed" element={<CompletedOrders />} />
+                    <Route path="canceled" element={<CanceledOrders />} />
+                  </Route>
+
+                  <Route
+                    path="/admin"
+                    element={
+                      <AdminProtectedRoute>
+                        <AdminLayout />
+                      </AdminProtectedRoute>
+                    }
+                  >
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="customers" element={<CustomerOrUser />}>
+                      <Route path="" element={<CustomerList />} />
+                      <Route path="create-customer" element={<CreateCustomer />} />
+                      <Route path="editcustomer" element={<EditCustomerForm />} />
+                    </Route>
+                    <Route path="addfooditem" element={<AddFoodItem />} />
+                    <Route path="addfooditem" element={<AddFoodItem />} />
+                    <Route path="devices" element={<Devices />} />
+                    <Route path="categories" element={<Categories />}>
+                      <Route path="" element={<CategoriesList />} />
+                      <Route path="bakery" element={<BackeryItems />} />
+                      <Route path="desserts" element={<DessertsItems />} />
+                      <Route path="lunch" element={<LunchItems />} />
+                      <Route path="breakfast" element={<BreakfastItems />} />
+                      <Route path="beverages" element={<BaverageItems />} />
+                      <Route path="snacks" element={<SnackItems />} />
+                    </Route>
+                    <Route path="orders" element={<Orders />} />
+                    <Route path="searchfood/:foodname" element={<SearchFood />} />
+                    <Route path="editfood" element={<FoodItemEditForm />} />
+                  </Route>
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </KitchenContextProvider>
+          </AdminContextProvider>
+        </FoodOrderProvider>
+      </FoodCardProvider>
     </>
   );
 }

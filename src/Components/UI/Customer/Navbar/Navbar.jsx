@@ -36,7 +36,7 @@ const Navbar = (props) => {
         <Link to="">
           <div className="font-Pacifico text-[1.3rem] text-[#000]">E-menu</div>
         </Link>
-        <div>
+        <div className="hidden md:block">
           <form action="search" onSubmit={handleSearchResult}>
             <input
               onChange={(e) => setSearchedText(e.target.value)}
@@ -50,7 +50,7 @@ const Navbar = (props) => {
           </form>
         </div>
 
-        <div className="flex gap-[4em] items-center">
+        <div className="flex gap-[2em] md:gap-[4em] items-center">
           <CustomerNotification />
           <div
             onClick={sideBarOpenHandler}
