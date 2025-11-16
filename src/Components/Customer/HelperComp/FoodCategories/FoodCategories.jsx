@@ -23,8 +23,8 @@ const FoodCategories = () => {
   };
 
   return (
-    <div className="container pb-6 pt-24">
-      <div className="flex justify-between items-center w-full overflow-x-auto gap-4">
+    <div className="container pb-6 pt-24 ">
+      <div className="flex justify-between items-center w-full overflow-x-auto gap-4 border-4 border-indigo-600 p-2">
         {categories.map((category) => (
           <NavLink
             key={category.name}
