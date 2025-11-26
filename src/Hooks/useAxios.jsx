@@ -2,11 +2,17 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "utils/axiosConfig";
 
-export const useAxios = ({ url, method = "GET", body = null, headers = {}, manual = false } = {}) => {
+export const useAxios = ({
+  url,
+  method = "GET",
+  body = null,
+  headers = {},
+  manual = false,
+} = {}) => {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // ✅ Track if request has been made (prevents duplicates)
   const hasFetched = useRef(false);
 

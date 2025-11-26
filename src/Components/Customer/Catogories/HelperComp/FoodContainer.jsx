@@ -20,12 +20,12 @@ const FoodContainer = ({ title, category }) => {
   const filteredFoodItems = foodItems?.filter((item) => item?.category === category);
 
   return (
-    <div className="container pt-5">
-      <div className="text-center pb-2 md:pb-10">
+    <div className="container mt-[13em]">
+      <div className="text-center mb-10 md:pb-10">
         <Title text={title} size="1.3rem" />
       </div>
 
-      <div className="overflow-y-scroll min-h-[110vh]">
+      <div className=" h-[70vh] overflow-y-scroll">
         {loading ? (
           <div className="flex justify-center py-8">
             <LoadingIcon />
@@ -33,7 +33,7 @@ const FoodContainer = ({ title, category }) => {
         ) : error ? (
           <div className="text-center text-red-600 mt-9 font-semibold">{error}</div>
         ) : filteredFoodItems?.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-12 lg:gap-6 xl:gap-8 mt-[2rem] ">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-12 lg:gap-6 xl:gap-8 md:mt-[2em]">
             {filteredFoodItems.map((food, i) => (
               <FoodCard food={food} key={food._id || i} />
             ))}
