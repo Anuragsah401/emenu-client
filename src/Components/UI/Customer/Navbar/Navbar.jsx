@@ -31,7 +31,7 @@ const Navbar = (props) => {
   };
 
   return (
-    <div className="py-3 bg-[#eee] fixed top-0 left-0 z-50 shadow-lg w-full">
+    <div className="py-3 bg-[#eee] fixed top-0 left-0 z-[60] shadow-lg w-full">
       <div className=" container max-w-[90rem] flex justify-between items-center text-center relative">
         <Link to="">
           <div className="font-Pacifico text-[1.3rem] text-[#000]">E-menu</div>

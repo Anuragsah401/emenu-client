@@ -7,10 +7,9 @@ import { useAxios } from "Hooks/useAxios";
 import LoadingIcon from "Assets/Icons/LoadingIcon";
 import FoodCard from "Components/UI/Customer/FoodCard/FoodCard";
 
-
 const SearchedResult = () => {
   const { foodname } = useParams();
-  
+
   const { response, loading, error } = useAxios({
     url: "/api/food",
   });
@@ -24,7 +23,7 @@ const SearchedResult = () => {
   });
 
   return (
-    <div className="container mt-8">
+    <div className="container mt-[13em] flex flex-col h-[calc(100vh-15em)] flex-1 overflow-y-auto md:pt-5 bg-[#f9f9f9] rounded-lg shadow-lg p-4">
       <div className="text-center">
         <Title text={`Search result for "${foodname}"`} />
       </div>
@@ -40,7 +39,6 @@ const SearchedResult = () => {
       ) : (
         <div className="text-center text-[2em] font-semibold mt-[2em]">No item found!</div>
       )}
-
     </div>
   );
 };
