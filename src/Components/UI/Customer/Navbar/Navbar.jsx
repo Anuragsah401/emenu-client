@@ -31,7 +31,7 @@ const Navbar = (props) => {
   };
 
   return (
-    <div className="py-3 bg-[#eee] shadow-lg fixed w-full z-30">
+    <div className="py-3 bg-[#eee] shadow-lg w-full">
       <div className=" container max-w-[90rem] flex justify-between items-center text-center relative">
         <Link to="">
           <div className="font-Pacifico text-[1.3rem] text-[#000]">E-menu</div>
@@ -58,9 +58,7 @@ const Navbar = (props) => {
           >
             <FontAwesomeIcon icon={faBars} size="lg" color="#000" />
           </div>
-          {props.backDrop ? (
-            <Backdrop CloseHandler={sideBarCloseHandler} />
-          ) : null}
+          {props.backDrop ? <Backdrop CloseHandler={sideBarCloseHandler} /> : null}
         </div>
       </div>
     </div>

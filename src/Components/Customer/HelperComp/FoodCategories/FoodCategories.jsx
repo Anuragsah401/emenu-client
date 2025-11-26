@@ -23,30 +23,32 @@ const FoodCategories = () => {
   };
 
   return (
-    <div className="container pb-6 pt-24 ">
-      <div className="flex justify-between items-center w-full overflow-x-auto gap-4 border-4 border-indigo-600 p-2">
-        {categories.map((category) => (
-          <NavLink
-            key={category.name}
-            to={`${category.name.toLocaleLowerCase()}`}
-            style={({ isActive }) => (isActive ? activeStyle : undefined)}
-            className="hover:bg-[#c75454] active:bg-[#c75454] rounded-md shadow-md"
-          >
-            <div
+    <div>
+      <div className="container mt-3 bg-[#f5f5f5] ">
+        <div className="flex justify-between items-center w-full overflow-x-auto gap-4 border-b-2 border-cyan-700 p-2">
+          {categories.map((category) => (
+            <NavLink
               key={category.name}
-              className="flex flex-col justify-center items-center w-[100px] h-[90px]"
+              to={`${category.name.toLocaleLowerCase()}`}
+              style={({ isActive }) => (isActive ? activeStyle : undefined)}
+              className="md:hover:bg-[#c75454] active:bg-[#c75454] rounded-md shadow-md"
             >
-              <div className="w-[45px] h-[45px]">
-                <img
-                  className="w-full h-full object-fill"
-                  src={category.icon}
-                  alt={category.name}
-                />
+              <div
+                key={category.name}
+                className="flex flex-col justify-center items-center w-[100px] h-[90px]"
+              >
+                <div className="w-[45px] h-[45px]">
+                  <img
+                    className="w-full h-full object-fill"
+                    src={category.icon}
+                    alt={category.name}
+                  />
+                </div>
+                <div className="text-black ">{category.name}</div>
               </div>
-              <div className="text-black ">{category.name}</div>
-            </div>
-          </NavLink>
-        ))}
+            </NavLink>
+          ))}
+        </div>
       </div>
     </div>
   );

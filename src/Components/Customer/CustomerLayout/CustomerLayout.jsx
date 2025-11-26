@@ -77,7 +77,7 @@ const CustomerLayout = ({ children }) => {
   }, [accept, cancel]);
 
   return (
-    <div className="bg-[#eee] relative max-h-full min-h-[100vh]">
+    <div className="bg-[#eee] h-screen overflow-y-hidden">
       <Navbar backDrop={backDrop} setBackDrop={setBackDrop} setSideBar={setSideBar} />
 
       <SideBar

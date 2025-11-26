@@ -6,7 +6,11 @@ import LoadingIcon from "Assets/Icons/LoadingIcon";
 import { useAxios } from "Hooks/useAxios";
 
 const TodaysSpecial = () => {
-  const { response: specials, loading, error } = useAxios({
+  const {
+    response: specials,
+    loading,
+    error,
+  } = useAxios({
     url: "/api/todaysspecial", // ✅ this will hit baseURL + this path
   });
 
@@ -24,13 +28,13 @@ const TodaysSpecial = () => {
 
       {!loading && error && (
         <div className="mt-9 flex justify-center items-center h-[240px] border-2 border-red-500 text-red-600">
-          {error}
+          {error && "Something went wrong!"}
         </div>
       )}
 
       {!loading && !error && specials?.length > 0 && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-12 lg:gap-6 xl:gap-8 mt-[2rem] text-white">
-          {specials.map((food) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-12 gap-5 lg:gap-6 xl:gap-8 mt-[2rem] text-white">
+          {specials?.map((food) => (
             <FoodCard food={food} key={food._id} />
           ))}
         </div>
