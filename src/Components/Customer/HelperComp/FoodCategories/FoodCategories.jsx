@@ -23,32 +23,30 @@ const FoodCategories = () => {
   };
 
   return (
-    <div className=" fixed top-0 left-0 w-full z-50 ">
-      <div className="container bg-[#f5f5f5] mt-20 ">
-        <div className="flex justify-between items-center w-full overflow-x-auto gap-4 border-b-2 border-cyan-700 p-2">
-          {categories.map((category) => (
-            <NavLink
+    <div className="container bg-[#f5f5f5]">
+      <div className="flex justify-between items-center w-full overflow-x-auto gap-4 border-b-2 border-cyan-700 p-2">
+        {categories.map((category) => (
+          <NavLink
+            key={category.name}
+            to={`${category.name.toLocaleLowerCase()}`}
+            style={({ isActive }) => (isActive ? activeStyle : undefined)}
+            className="md:hover:bg-[#c75454] active:bg-[#c75454] rounded-md shadow-md"
+          >
+            <div
               key={category.name}
-              to={`${category.name.toLocaleLowerCase()}`}
-              style={({ isActive }) => (isActive ? activeStyle : undefined)}
-              className="md:hover:bg-[#c75454] active:bg-[#c75454] rounded-md shadow-md"
+              className="flex flex-col justify-center items-center w-[100px] h-[90px]"
             >
-              <div
-                key={category.name}
-                className="flex flex-col justify-center items-center w-[100px] h-[90px]"
-              >
-                <div className="w-[45px] h-[45px]">
-                  <img
-                    className="w-full h-full object-fill"
-                    src={category.icon}
-                    alt={category.name}
-                  />
-                </div>
-                <div className="text-black ">{category.name}</div>
+              <div className="w-[45px] h-[45px]">
+                <img
+                  className="w-full h-full object-fill"
+                  src={category.icon}
+                  alt={category.name}
+                />
               </div>
-            </NavLink>
-          ))}
-        </div>
+              <div className="text-black ">{category.name}</div>
+            </div>
+          </NavLink>
+        ))}
       </div>
     </div>
   );

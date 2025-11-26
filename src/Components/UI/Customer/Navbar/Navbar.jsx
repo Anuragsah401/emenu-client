@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 import Backdrop from "../../Backdrop/Backdrop";
-import BellIcon from "Assets/Icons/BellIcon";
 import CustomerNotification from "./CustomerNotification";
 
 const Navbar = (props) => {
@@ -31,8 +30,8 @@ const Navbar = (props) => {
   };
 
   return (
-    <div className="py-3 bg-[#eee] fixed top-0 left-0 z-[60] shadow-lg w-full">
-      <div className=" container max-w-[90rem] flex justify-between items-center text-center relative">
+    <div className="py-3 bg-[#eee] shadow-lg w-full flex-col justify-between items-center">
+      <div className=" container max-w-[90rem] flex justify-between items-center gap-10 text-center relative">
         <Link to="">
           <div className="font-Pacifico text-[1.3rem] text-[#000]">E-menu</div>
         </Link>
@@ -60,6 +59,24 @@ const Navbar = (props) => {
           </div>
           {props.backDrop ? <Backdrop CloseHandler={sideBarCloseHandler} /> : null}
         </div>
+      </div>
+
+      <div className=" md:hidden ">
+        <form
+          className="w-full flex justify-center items-center"
+          action="search"
+          onSubmit={handleSearchResult}
+        >
+          <input
+            onChange={(e) => setSearchedText(e.target.value)}
+            type="text"
+            placeholder="search your fav food..."
+            className="p-[0.6rem] w-[300px] rounded-l-lg outline-none bg-slate-800 text-white placeholder-[#aaa7a7]"
+          />
+          <button className="py-[0.6rem] px-[0.8rem] text-white bg-[#20CFBA] hover:bg-black rounded-r-lg">
+            Search
+          </button>
+        </form>
       </div>
     </div>
   );
