@@ -27,7 +27,7 @@ const FoodContainer = ({ title, category }) => {
       </div>
 
       {/* Scrollable GRID */}
-      <div className="flex-1 overflow-y-auto mt-4 pb-6">
+      <div className="flex-1 overflow-y-auto mt-4 pb-10">
         {loading ? (
           <div className="flex justify-center py-8">
             <LoadingIcon />
