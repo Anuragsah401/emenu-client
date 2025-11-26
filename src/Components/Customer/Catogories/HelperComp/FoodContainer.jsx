@@ -20,7 +20,7 @@ const FoodContainer = ({ title, category }) => {
   const filteredFoodItems = foodItems?.filter((item) => item?.category === category);
 
   return (
-    <div className="container pt-[14rem] flex flex-col h-screen">
+    <div className="container pt-[14rem] flex flex-col h-screen fixed left-0 right-0">
       {/* Sticky Title Right Under Navbar */}
       <div className=" top-[20rem] bg-white z-40 py-2 text-center shadow-sm">
         <Title text={title} size="1.3rem" />
