@@ -1,5 +1,4 @@
 import React, { useContext, useState, createContext, useEffect, useRef } from "react";
-import axios from "axios";
 import { io } from "socket.io-client";
 import { useAxios } from "Hooks/useAxios";
 import { notify } from "Components/UI/Toast/Toast";
@@ -10,15 +9,17 @@ export const useKitchenContext = () => useContext(KitchenContext);
 
 export const KitchenContextProvider = ({ children }) => {
   const [orderData, setorderData] = useState([]);
-  const { response, loading, error } = useAxios({ url: "/api/orderlist" });
   const [bellTone] = useState(new Audio(orderTone));
 
-  // ✅ Create socket ref to persist connection
-  const socketRef = useRef(null);
+  // ⬇ Initial fetch using useAxios
+  const { response, loading, fetchData } = useAxios({
+    url: "/api/orderlist",
+  });
 
+  // 🎧 SOCKET SETUP
+  const socketRef = useRef(null);
   useEffect(() => {
     const socketURL = process.env.REACT_APP_SOCKET_URL || "http://localhost:4000";
-
     const socket = io(socketURL, {
       transports: ["websocket", "polling"],
       withCredentials: true,
@@ -26,94 +27,84 @@ export const KitchenContextProvider = ({ children }) => {
 
     socketRef.current = socket;
 
-    socket.on("connect", () => {
-      console.log("✅ Connected to socket:", socket.id);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("❌ Disconnected from socket");
-    });
-
-    // ✅ Handle "new order" event
     socket.on("new order", (order) => {
-      console.log("📦 New order received:", order);
-      setorderData((prevOrders) => [order, ...prevOrders]);
+      setorderData((prev) => [order, ...prev]);
       bellTone.play();
     });
 
-    // ✅ Handle "update order" event
     socket.on("update order", (updatedOrder) => {
       setorderData((prev) =>
         prev.map((order) => (order._id === updatedOrder._id ? updatedOrder : order))
       );
     });
 
-    // ✅ Cleanup
-    return () => {
-      socket.disconnect();
-      console.log("🧹 Socket disconnected (cleanup)");
-    };
+    return () => socket.disconnect();
   }, [bellTone]);
 
-  // ✅ Sync with API response
+  // 🔄 Sync with API response
   useEffect(() => {
-    if (response && Array.isArray(response)) {
-      setorderData(response);
-    } else if (response) {
-      console.warn("Unexpected API response:", response);
-      setorderData([]);
-    }
+    if (Array.isArray(response)) setorderData(response);
   }, [response]);
 
-  // --- API functions ---
-  const startOrder = async (orderId) => {
-    const list = orderData.find((item) => item._id === orderId);
-    if (!list) return;
+  // 🛠 Helper function to PATCH with useAxios
+  const patchOrder = async (orderId, data) => {
+    return await fetchData({
+      url: `/api/orderlist/updatelist/${orderId}`,
+      method: "PATCH",
+      body: data,
+    });
+  };
 
-    const updated = { ...list, orderStatus: "started" };
-    await axios.patch(`/api/orderlist/updatelist/${orderId}`, updated);
+  // 🍳 Start Order
+  const startOrder = async (orderId) => {
+    const order = orderData.find((item) => item._id === orderId);
+    if (!order) return;
+
+    const updated = { ...order, orderStatus: "started" };
+    await patchOrder(orderId, updated);
+
     notify(`Order from ${updated.tableNo} has been started!`);
   };
 
+  // 🔁 Update Single Food Item
   const updateOrderList = async (orderId, foodId) => {
-    const list = orderData.find((item) => item._id === orderId);
-    if (!list) return;
+    const order = orderData.find((item) => item._id === orderId);
+    if (!order) return;
 
-    const updatedList = list.foodList.map((item) =>
-      item._id === foodId ? { ...item, completed: !item.completed } : item
+    const updatedFood = order.foodList.map((i) =>
+      i._id === foodId ? { ...i, completed: !i.completed } : i
     );
 
-    const updated = { ...list, foodList: updatedList };
-    await axios.patch(`/api/orderlist/updatelist/${orderId}`, updated);
+    const updated = { ...order, foodList: updatedFood };
+    await patchOrder(orderId, updated);
 
-    setorderData((prev) =>
-      prev.map((item) => (item._id === orderId ? updated : item))
-    );
+    setorderData((prev) => prev.map((i) => (i._id === orderId ? updated : i)));
   };
 
+  // 🏁 Complete Order
   const changeOrderStatusToComplete = async (orderId) => {
-    const list = orderData.find((item) => item._id === orderId);
-    if (!list) return;
+    const order = orderData.find((item) => item._id === orderId);
+    if (!order) return;
 
-    const isFoodItemComplete = list.foodList.every((item) => item.completed);
-    if (!isFoodItemComplete) return;
+    if (!order.foodList.every((i) => i.completed)) return;
 
-    const updated = { ...list, orderStatus: "completed" };
-    await axios.patch(`/api/orderlist/updatelist/${orderId}`, updated);
+    const updated = { ...order, orderStatus: "completed" };
+    await patchOrder(orderId, updated);
 
     setorderData((prev) => prev.filter((item) => item._id !== orderId));
     notify(`Order from ${updated.tableNo} completed!`);
   };
 
-  const cancelOrderHandler = async (id) => {
-    const canceledOrder = orderData.find((item) => item._id === id);
-    if (!canceledOrder) return;
+  // ❌ Cancel Order
+  const cancelOrderHandler = async (orderId) => {
+    const order = orderData.find((item) => item._id === orderId);
+    if (!order) return;
 
-    const updated = { ...canceledOrder, orderStatus: "canceled" };
-    await axios.patch(`/api/orderlist/updatelist/${id}`, updated);
+    const updated = { ...order, orderStatus: "canceled" };
+    await patchOrder(orderId, updated);
+
+    setorderData((prev) => prev.filter((item) => item._id !== orderId));
     notify(`Order from ${updated.tableNo} has been canceled!`);
-
-    setorderData((prev) => prev.filter((item) => item._id !== id));
   };
 
   return (

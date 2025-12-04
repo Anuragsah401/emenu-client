@@ -23,7 +23,7 @@ const FoodCategories = () => {
   };
 
   return (
-    <div className="container bg-[#f5f5f5]">
+    <div className="container bg-[#f5f5f5] relative mt-7">
       <div className="flex justify-between items-center w-full overflow-x-auto gap-4 border-b-2 border-cyan-700 p-2">
         {categories.map((category) => (
           <NavLink

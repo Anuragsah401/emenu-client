@@ -20,14 +20,14 @@ const FoodContainer = ({ title, category }) => {
   const filteredFoodItems = foodItems?.filter((item) => item?.category === category);
 
   return (
-    <div className="container pt-4 flex flex-col h-screen fixed left-0 right-0">
-      {/* Sticky Title Right Under Navbar */}
-      <div className=" bg-white z-40 py-2 text-center shadow-sm">
+    <div className="container flex flex-col max-h-screen pt-4">
+      {/* Sticky Title */}
+      <div className="bg-white z-40 py-2 text-center shadow-sm">
         <Title text={title} size="1.3rem" />
       </div>
 
-      {/* Scrollable GRID */}
-      <div className="flex-1 overflow-y-auto mt-4 pb-10 bg-[#f9f9f9] rounded-lg shadow-lg p-4">
+      {/* Scrollable Content */}
+      <div className="max-h-[65vh] md:max-h-[60vh] overflow-y-auto mt-4 bg-[#f9f9f9] rounded-lg shadow-lg p-4">
         {loading ? (
           <div className="flex justify-center py-8">
             <LoadingIcon />
