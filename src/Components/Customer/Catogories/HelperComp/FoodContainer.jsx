@@ -27,7 +27,7 @@ const FoodContainer = ({ title, category }) => {
       </div>
 
       {/* Scrollable Content */}
-      <div className="max-h-[65vh] md:max-h-[60vh] overflow-y-auto mt-4 bg-[#f9f9f9] rounded-lg shadow-lg p-4">
+      <div className="h-[calc(100vh-20em)] md:max-h-[60vh] overflow-y-auto mt-4 bg-[#f9f9f9] rounded-lg shadow-lg p-4">
         {loading ? (
           <div className="flex justify-center py-8">
             <LoadingIcon />
